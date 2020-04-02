@@ -1,0 +1,81 @@
+Bootstrap: docker
+From: ubuntu:18.04
+
+%runscript
+	exec /usr/local/bin/E2P2 "$@"
+
+%help
+
+Usage: singularity exec $CONTAINER run_pipeline.py
+
+This is an E2P2 container built upon
+ - E2P2 LIPM v4.2
+ - Priam (last java version)
+ - ncbi-blast-2.10.0+
+ - python 3
+
+
+%labels
+    Maintainer Ludovic.Cottret@inrae.fr
+    E2P2 : Version LIPM 4.2
+    
+%post
+
+	apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y \
+		wget \
+        openjdk-8-jre   \
+        python3         \
+        git
+    apt-get clean && \
+    apt-get purge 
+
+	mkdir -p /opt
+	cd /opt
+
+    # E2P2 pipeline
+    mkdir -p /usr/local/bin
+    git clone --branch 4.2 https://github.com/lcottret/E2P2.git
+    echo '#!/bin/bash\n\npython3 /opt/E2P2/pipeline/run_pipeline.py -b /opt/ncbi-blast-2.10.0+/bin/blastp -bb /opt/ncbi-blast-2.10.0+/bin/ -j java -ps /opt/PRIAM/PRIAM_search.jar -r /opt/data/E2P2/blastdb/rpsd-4.2.fasta -pp /opt/data/E2P2/profiles $@'  >> /usr/local/bin/E2P2 && chmod +x /usr/local/bin/E2P2
+	
+    # blast+ binaries
+	wget -O /opt/ncbi-blast-2.10.0+-x64-linux.tar.gz ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.10.0/ncbi-blast-2.10.0+-x64-linux.tar.gz
+    tar xvf ncbi-blast-2.10.0+-x64-linux.tar.gz 
+    rm -f /opt/ncbi-blast-2.10.0+-x64-linux.tar.gz
+
+    # E2P2 data
+    mkdir -p /opt/data/E2P2
+    cd /opt/data/E2P2
+    wget https://ftp.dpb.carnegiescience.edu/rpsd/release_2019-03-07/blastdb.tar.gz
+    wget https://ftp.dpb.carnegiescience.edu/rpsd/release_2019-03-07/profiles.tar.gz
+    wget https://ftp.dpb.carnegiescience.edu/rpsd/release_2019-03-07/maps.tar.gz
+    wget https://ftp.dpb.carnegiescience.edu/rpsd/release_2019-03-07/weights.tar.gz
+    
+    tar zxvf blastdb.tar.gz
+    tar zxvf profiles.tar.gz
+    tar zxvf maps.tar.gz
+    tar zxvf weights.tar.gz
+
+    rm -f *.tar.gz
+
+    rm -rf /opt/E2P2/data/*
+
+    mv maps weights /opt/E2P2/data
+    
+    # PRIAM program
+    mkdir -p /opt/PRIAM
+    cd /opt/PRIAM
+    wget http://priam.prabi.fr/utilities/PRIAM_search.jar
+
+    mkdir /opt/run
+
+    chmod -R 755 /opt/run
+
+
+%environment
+export LC_ALL=C
+export HOME=/opt/run
+export PATH=/opt/E2P2/pipeline:$PATH
+cd $HOME
+
