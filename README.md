@@ -26,3 +26,12 @@ Note: You don't need the following parameters since everything is packaged in th
 - -ps 
 - -r 
 - -pp 
+
+Use the -be option to set the blastp evalue threshold (default: 1e-2)
+
+
+Run on a multifasta file:
+```
+e2p2-singularity -i proteome.fas -be "1e-6"
+```
+
