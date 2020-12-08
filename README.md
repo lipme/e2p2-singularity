@@ -2,7 +2,7 @@
 
 Singularity instance for E2P2 (prediction of enzymatic functions).
 
-E2P2 V4 forked by Ludo Cottret.
+E2P2 Master version https://github.com/carnegie/E2P2
 
 ## Build
 

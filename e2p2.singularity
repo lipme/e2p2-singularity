@@ -1,3 +1,16 @@
+# Copyright 2020 [LIPM]
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+# http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+#    limitations under the License.
+
 Bootstrap: docker
 From: ubuntu:18.04
 
@@ -9,7 +22,7 @@ From: ubuntu:18.04
 Usage: singularity exec $CONTAINER run_pipeline.py
 
 This is an E2P2 container built upon
- - E2P2 LIPM v4.2
+ - E2P2 last master version https://github.com/carnegie/E2P2
  - Priam (last java version)
  - ncbi-blast-2.10.0+
  - python 3
@@ -17,7 +30,7 @@ This is an E2P2 container built upon
 
 %labels
     Maintainer Ludovic.Cottret@inrae.fr
-    E2P2 : Version LIPM 4.2
+    E2P2 : https://github.com/carnegie/E2P2
     
 %post
 
@@ -36,7 +49,7 @@ This is an E2P2 container built upon
 
     # E2P2 pipeline
     mkdir -p /usr/local/bin
-    git clone --branch 4.2 https://github.com/lcottret/E2P2.git
+    git clone https://github.com/carnegie/E2P2.git
     echo '#!/bin/bash\n\npython3 /opt/E2P2/pipeline/run_pipeline.py -b /opt/ncbi-blast-2.10.0+/bin/blastp -bb /opt/ncbi-blast-2.10.0+/bin/ -j java -ps /opt/PRIAM/PRIAM_search.jar -r /opt/data/E2P2/blastdb/rpsd-4.2.fasta -pp /opt/data/E2P2/profiles $@'  >> /usr/local/bin/E2P2 && chmod +x /usr/local/bin/E2P2
 	
     # blast+ binaries
