@@ -1,0 +1,13 @@
+Source Code Modification:
+	
+	New CLI argument "-r" to set run directory
+	Default is CLI baseDir (not Singularity compliant)
+
+	New CLI argument  "-e" to set blastp evalue
+	Default 1e-5
+
+	New CLI argument  "-t" to set blastp threads
+	Default 1
+
+	New companion script "pf2tsv.pl" to convert  .pf to tabulated format:
+	

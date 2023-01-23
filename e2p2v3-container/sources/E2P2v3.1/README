@@ -1,0 +1,112 @@
+Ensemble Enzyme Prediction Pipeline (E2P2)
+
+Version 3.1
+December 15, 2016
+=====================================================
+We recommend downloading the tar.gz on Linux systems to avoid 
+the unzip failure of zip format caused by "symlink error: File name too long".
+
+Bug fixes:
+
+1. Removed e-value (e-2) argument from blast run. The e-value argument in 
+blast command had unexpected impacts. Better hits were sometimes not returned. 
+The e-value cutoff is applied in a later step to filter all blast hits.  
+2. To better support parallel run of E2P2 for multiple input sequence files, 
+individual folder for hosting intermediate files is now created for each input.
+
+
+Important reminder about input protein sequence fasta headers:
+For E2P2 to run properly the fasta headers of input protein sequences 
+should follow this format:
+>unique_sequence_ID [followed by a “|” or a space before anything else]
+ 
+October 25, 2018
+Changes:
+1. Updated data in E2P2 tools.
+2. Added script to map protein IDs to Gene IDs in pf files (written in python 3).
+	python3 pf_maptogene.py /PATH/TO/PFFiles.pf /PATH/TO/proteinIDToGeneIDMap.txt
+   The 'proteinIDToGeneIDMap.txt' is a tab delimited file that maps protein IDs
+   from the protein sequence to their gene IDs. For Example:
+	AT5G41480.1	AT5G41480
+	AT2G20710.1	AT2G20710
+	AT2G46270.2	AT2G46270
+	AT5G60440.1	AT5G60440
+	AT2G27040.1	AT2G27040
+
+
+Ensemble Enzyme Prediction Pipeline (E2P2)
+Version 3.0
+July 15, 2015
+======================================================
+
+
+What's new
+----------
+In version 3.0, E2P2 updated its BLAST and PRIAM programs to the latest 
+versions. It uses RPSD 3.1 compiled recently as reference enzyme set. We 
+adjusted the cutoff of BLAST and the ensemble scheme according to our 
+assessment based on the new RPSD 3.1. 
+
+E2P2 v3.0 also provides an additional output .orxn.pf file which 
+translates EC numbers to their official reactions in MetaCyc reaction 
+identifiers. Using this .pf file would prevent over propagation of EC 
+numbers to all their descendent reactions by PathoLogic of Pathway Tools 
+while creating pathway databases.
+
+In the folder tools, we also provide some perl scripts for pre-process FASTA 
+sequence files. 'cutter-fasta.pl' could be used to split huge sequence files 
+into small ones to run E2P2 on them in parallel. 
+
+'pf-EC-to-official-RXN.pl' is already built-in and needed as the final step
+of runE2P2.py.
+
+Description
+-----------
+The Ensemble Enzyme Prediction Pipeline (E2P2, version 3.0) annotates 
+protein sequences with Enzyme Function classes comprised of full, four-part 
+Enzyme Commission numbers and MetaCyc reaction identifiers. It is the enzyme 
+annotation pipeline used to generate the species-specific metabolic databases 
+at the Plant Metabolic Network (www.plantcyc.org) since 2013. E2P2 
+systematically integrates results from two molecular function annotation 
+algorithms using an ensemble classification scheme. For a given genome, all 
+protein sequences are submitted as individual queries against the base-level 
+annotation methods. E2P2 v3.0 used a custom database of annotated protein 
+sequences, which we refer to as the Reference Protein Sequence Dataset (RPSD 
+version 3.1). RPSD 3.1 contains approximately 50,182 enzyme and 91,855 
+non-enzyme sequences, compiled from manually curated or experimentally 
+supported data in UniProt/SwissProt (November, 2014 release), BRENDA 
+(November, 2014 release), MetaCyc (November, 2014 release), and PlantCyc 
+(November, 2014 release). The individual methods rely on homology transfer 
+from RPSD 3.1 sequences, using single sequence (BLAST, E-value cutoff <= 
+1e-2) and multiple sequence models (PRIAM) of enzymatic functions using 
+custom profile libraries trained on enzyme sequence data annotated in RPSD 
+3.1. The base-level predictions are then integrated into a final set of 
+annotations using an maximum weighted integration algorithm, where the 
+weight of each prediction from each individual method was determined via a 
+5x3 nested cross-validation process. 
+
+Installation
+------------
+The archived package is available from:
+https://dpb.carnegiescience.edu/labs/rhee-lab/software
+
+Unzip and extract the E2P2 package in your target location:
+tar -xzf e2p2-3.0.tar.gz
+
+Operation
+---------
+E2P2 was built to run on 64-bit Linux systems. As an in-house pipeline, it has 
+not been tested widely on different systems. It relies on two individual 
+methods, each of which has its own dependencies. All supporting programs, 
+including dependencies, are bundled into the E2P2 package.
+
+The input file containing protein sequence data must be in FASTA format.
+Specify the paths of the input and output files and run E2P2 with the 
+following command:
+./runE2P2.py -i <input filename> -o <output filename>
+
+For whole-genome datasets, we suggest partitioning the input sequence file
+into subsets and running them in parallel in a distributed environment.
+
+Contact us regarding questions and issues at curator@plantcyc.org.
+
